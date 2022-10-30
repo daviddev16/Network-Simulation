@@ -27,14 +27,18 @@ public abstract class BaseDevice : MonoBehaviour, Hardware
         }
     }
 
-    public virtual void Start()
+    public virtual void Awake()
     {
-        Debug.Log("Loaded:BaseDevice");
+        Debug.Log("Awake:BaseDevice");
     }
 
-    public virtual void Update()
+    public virtual void Start()
     {
-        
+        Debug.Log("Start:BaseDevice");
     }
+
+    public virtual void Update() {}
+
+    public abstract void Initialize();
 
 }

@@ -1,13 +1,12 @@
-using System.Collections;
+
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseNetworkDevice : BaseDevice, NetworkDevice
+public abstract class BaseNetworkDevice : BaseDevice, NetworkDevice
 {
+    [SerializeField] private List<TestNetworkInterface> networkInterfaces;
 
-    private HashSet<NetworkInterface> networkInterfaces;
-
-    public HashSet<NetworkInterface> NetworkInterfaces 
+    public List<TestNetworkInterface> NetworkInterfaces 
     { 
         get => networkInterfaces; 
         set
@@ -17,8 +16,10 @@ public class BaseNetworkDevice : BaseDevice, NetworkDevice
         }
     }
 
-    new void Start()
+    new void Awake()
     {
-        base.Start();
+        NetworkInterfaces = new List<TestNetworkInterface>();
+        base.Awake();
     }
+
 }
