@@ -8,22 +8,13 @@ public class ComputerDevice : BaseNetworkDevice
     {
         foreach(TestNetworkInterface netInt in NetworkInterfaces)
         {
-            foreach(EthernetDataLinkPort ethernet in netInt.DataLinkPorts)
-            {
-                ethernet.SendSignal();
-            }
+            netInt.DataLinkPort.SendSignal();
         }
     }
 
     new void Awake()
     {
         base.Awake();
-
-        foreach (TestNetworkInterface tni in GetComponents<TestNetworkInterface>())
-        {
-            NetworkInterfaces.Add(tni);
-        }
-
     }
 
     // Start is called before the first frame update

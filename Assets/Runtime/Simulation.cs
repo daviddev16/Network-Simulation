@@ -10,24 +10,25 @@ public class Simulation : MonoBehaviour
 
     void Start()
     {
-
-     
-        List<TestNetworkInterface> netIntC1 = computerDevice1.NetworkInterfaces;
-        netIntC1[0].DataLinkPorts[0].PluggedDevice = computerDevice2.NetworkInterfaces[0].DataLinkPorts[0];
-
-        List<TestNetworkInterface> netIntC2 = computerDevice2.NetworkInterfaces;
-        netIntC2[0].DataLinkPorts[0].PluggedDevice = computerDevice1.NetworkInterfaces[0].DataLinkPorts[0];
-
-        /* plugando cabo de rede no computador  */
-
-        computerDevice1.Initialize();
-        computerDevice2.Initialize();
-
-
+        initState();
     }
 
     void Update()
     {
         
+    }
+
+    public void initState()
+    {
+        List<TestNetworkInterface> netIntC1 = computerDevice1.NetworkInterfaces;
+        netIntC1[0].DataLinkPort.PluggedDevice = computerDevice2.NetworkInterfaces[0].DataLinkPort;
+
+        List<TestNetworkInterface> netIntC2 = computerDevice2.NetworkInterfaces;
+        netIntC2[0].DataLinkPort.PluggedDevice = computerDevice1.NetworkInterfaces[0].DataLinkPort;
+
+        /* plugando cabo de rede no computador  */
+
+        computerDevice1.Initialize();
+        computerDevice2.Initialize();
     }
 }

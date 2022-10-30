@@ -6,7 +6,7 @@ using UnityEngine;
 public class TestNetworkInterface : MonoBehaviour, NetworkInterface
 {
 
-    [SerializeField] private List<EthernetDataLinkPort> dataLinks;
+    [SerializeField] private EthernetDataLinkPort dataLink;
 
     private string mac;
 
@@ -15,13 +15,10 @@ public class TestNetworkInterface : MonoBehaviour, NetworkInterface
         get => gameObject.name + "@networkinterface@Device";
         set => mac = value;
     }
-    public List<EthernetDataLinkPort> DataLinkPorts { get => dataLinks; set => dataLinks = value; }
+    public EthernetDataLinkPort DataLinkPort { get => dataLink; set => dataLink = value; }
 
     private void Awake()
     {
-        foreach (DataLinkPort port in DataLinkPorts)
-        {
-            port.Parent = this;
-        }
+        DataLinkPort.Parent = this;
     }
 }

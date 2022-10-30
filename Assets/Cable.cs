@@ -20,9 +20,7 @@ public class Cable : MonoBehaviour
     [SerializeField] private bool b1;
 
 
-    void Start()
-    {
-    }
+    void Start() { }
 
     void Update()
     {
@@ -30,9 +28,9 @@ public class Cable : MonoBehaviour
             lineRenderer = GetComponent<LineRenderer>();
 
         positions[0] = start.position;
-        positions[1] = start.position + (b0 ? Vector3.right :  Vector3.left) * 0.5f;
+        positions[1] = start.position + (b0 ? Vector3.right :  Vector3.left) * 0.1f;
 
-        positions[2] = end.position - (b1 ? Vector3.right : Vector3.left) * 0.5f;
+        positions[2] = end.position - (b1 ? Vector3.right : Vector3.left) * 0.1f;
         positions[3] = end.position;
 
         lineRenderer.positionCount = 4;

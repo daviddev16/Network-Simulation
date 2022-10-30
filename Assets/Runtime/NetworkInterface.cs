@@ -5,6 +5,6 @@ using UnityEngine;
 public interface NetworkInterface
 {
     string MacAddress { get; set; }
-    List<EthernetDataLinkPort> DataLinkPorts { get; set; }
+    EthernetDataLinkPort  DataLinkPort { get; set; }
 
 }
