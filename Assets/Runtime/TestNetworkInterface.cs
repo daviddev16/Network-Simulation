@@ -12,13 +12,14 @@ public class TestNetworkInterface : MonoBehaviour, NetworkInterface
 
     public string MacAddress 
     {
-        get => gameObject.name + "@networkinterface@Device";
+        get => mac;
         set => mac = value;
     }
     public EthernetDataLinkPort DataLinkPort { get => dataLink; set => dataLink = value; }
 
     private void Awake()
     {
+        MacAddress = Utility.GenerateMACAddress();
         DataLinkPort.Parent = this;
     }
 }

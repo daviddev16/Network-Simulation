@@ -16,11 +16,16 @@ public class Cable : MonoBehaviour
 
     private LineRenderer lineRenderer;
 
-    [SerializeField] private bool b0;
-    [SerializeField] private bool b1;
+    [SerializeField] public bool b0;
+    [SerializeField] public bool b1;
 
+    private Vector3 endDiff;
+    private Vector3 diff;
 
-    void Start() { }
+    void Start() 
+    {
+        endDiff = new Vector3(end.position.x, end.position.y, 0);
+    }
 
     void Update()
     {
@@ -36,8 +41,21 @@ public class Cable : MonoBehaviour
         lineRenderer.positionCount = 4;
         lineRenderer.SetPositions(positions);
 
+        if (diff.x < 0.01)
+        {
+            b1 = false;
+        }
+        else
+        {
+            b1 = true;
+        }
 
+    }
 
+    private void FixedUpdate()
+    {
+        diff = end.position - endDiff;
+        //Debug.Log(diff.x);
     }
 
 }
