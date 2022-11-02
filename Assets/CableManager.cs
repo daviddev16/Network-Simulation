@@ -1,121 +1,148 @@
-using System.Collections;
-using System.Collections.Generic;
+
+using System;
 using UnityEngine;
 
-/*TODO: refatorar depois */
 public class CableManager : MonoBehaviour
 {
+    private Edit2Controller controller;
 
-    public bool isClickedOver = false;
-    public bool isDragging = false;
+    [SerializeField] private AbstractPhysicalLink selectedPhysicalLink;
+    [SerializeField] private Cable ghostCable;
+    
+    [SerializeField] private bool IsClicked;
+    [SerializeField] public bool IsDragging = false;
 
-
-    public GameObject cablePrefab;
-
-    public Cable currentTrackedCable;
-
-    public GameObject datalinkSelected;
-    // Start is called before the first frame update
     void Start()
     {
-        
+        controller = FindObjectOfType<Edit2Controller>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && currentTrackedCable == null)
+        /*if (controller.IsDragging)
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            var hits = Physics2D.GetRayIntersectionAll(ray, 10f);
+            return;
+        }*/
+        DetectClickInPhysicalLinkOnScreen();
+        CheckIsCastingOtherLink();
+        ManageGhostCable();
+        CheckIsDragging();
+    }
 
-            foreach (var hit in hits)
+    private void CheckIsCastingOtherLink()
+    {
+        if (Input.GetMouseButtonUp(0))
+        {
+            IsClicked = false;
+            if (selectedPhysicalLink != null)
             {
-                if (hit.collider.gameObject.GetComponent<DataLinkPort>() != null)
-                {
-                    if (hit.collider.gameObject.GetComponent<DataLinkPort>().PluggedDevice != null) 
-                    {
-                        continue;
-                    }
-                    datalinkSelected = hit.collider.gameObject;
-                    isClickedOver = true;
+                AbstractPhysicalLink otherPhysicalLink = FindPhysicalLinkOnScreen();
+
+                /* verificar se não é o mesmo gameobject ou se o outro link já não está conectado */
+                if (otherPhysicalLink == null || 
+                    otherPhysicalLink.gameObject == selectedPhysicalLink.gameObject ||
+                    otherPhysicalLink.Other != null)
                     return;
-                }
+
+                /* build a real cable */
+                Cable connectionCable = CreateCable();
+
+                connectionCable.StartLocation = selectedPhysicalLink.transform;
+                connectionCable.EndLocation = otherPhysicalLink.transform;
+
+                selectedPhysicalLink.Connect(otherPhysicalLink, connectionCable);
+                otherPhysicalLink.Connect(selectedPhysicalLink, connectionCable);
+
+                /* desenhar cabo */
+                connectionCable.Show();
             }
         }
+    }
 
-        if (isClickedOver && Input.GetMouseButton(0))
+    /* gerenciar cabo temporario */
+    private void ManageGhostCable()
+    {
+        if (IsDragging)
         {
-            isDragging = true;
+            if (selectedPhysicalLink != null)
+            {
+                if (ghostCable == null && selectedPhysicalLink.Other == null)
+                {
+                    ghostCable = CreateCable();
+                    ghostCable.StartLocation = selectedPhysicalLink.transform;
+                }
+                else if (ghostCable != null)
+                {
+                    Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    pos.z = 0;
+                    ghostCable.EndLocation.position = pos;
+                    ghostCable.Show();
+                }
+            }
         }
         else
         {
-            isDragging = false;
-        }
-
-        if (isDragging && currentTrackedCable == null && datalinkSelected != null)
-        {
-            currentTrackedCable = Instantiate(cablePrefab, Vector3.zero, Quaternion.identity, transform).GetComponent<Cable>();
-            currentTrackedCable.start.position = datalinkSelected.transform.position;
-        }
-
-        if (currentTrackedCable != null)
-        {
-            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            pos.z = 0;
-            currentTrackedCable.end.position = pos;
-            if(!currentTrackedCable.GetComponent<LineRenderer>().enabled)
+            if (ghostCable != null)
             {
-                currentTrackedCable.GetComponent<LineRenderer>().enabled = true;
+                Destroy(ghostCable.gameObject);
+            }
+            
+        }
+    }
+    
+    /* detectar se o usuário está tentando criar uma conexão em um PhysicalLink */
+    private void DetectClickInPhysicalLinkOnScreen()
+    {
+        if (!IsDragging)
+        {
+            selectedPhysicalLink = null;
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            /* achou um link na tela */
+            AbstractPhysicalLink detectedPhysicalLink = FindPhysicalLinkOnScreen();
+
+            if (detectedPhysicalLink == null)
+                return;
+
+            selectedPhysicalLink = detectedPhysicalLink;
+            IsClicked = true;
+            
+            /* remover link */
+            if (Input.GetKey(KeyCode.LeftAlt) && selectedPhysicalLink.Other != null)
+                ClearLinkConnection(ref detectedPhysicalLink);
+        }
+    }
+
+    private AbstractPhysicalLink FindPhysicalLinkOnScreen()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, 10f);
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider.TryGetComponent<AbstractPhysicalLink>(out var physicalLink))
+            {
+                return physicalLink;
             }
         }
+        return null;
+    }
+    private void ClearLinkConnection(ref AbstractPhysicalLink physicalLink)
+    {
+        physicalLink.ConnectedCable.Disconnect();
+        AbstractPhysicalLink otherPhysicalLink = physicalLink.Other;
+        physicalLink.Disconnect();
+        otherPhysicalLink.Disconnect();
+    }
 
-        if (!isDragging)
-        {
+    private Cable CreateCable()
+    {
+        GameObject cablePrefab = PrefabManager.GetPrefabOf(PrefabType.CABLE);
+        return Instantiate(cablePrefab, Vector3.zero, Quaternion.identity, transform).GetComponent<Cable>();
+    }
 
-            if(currentTrackedCable != null && datalinkSelected != null)
-            {
-                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                var hits = Physics2D.GetRayIntersectionAll(ray, 10f);
-                /* tentar conectar */
-                foreach (var hit in hits)
-                {
-                    if (hit.collider.gameObject.GetComponent<DataLinkPort>() != null && hit.collider.gameObject != datalinkSelected.gameObject)
-                    {
-
-                        GameObject newLink = hit.collider.gameObject;
-
-                        if (newLink.GetComponent<DataLinkPort>().PluggedDevice != null)
-                        {
-                            continue;
-                        }
-
-                        Cable newCable = Instantiate(cablePrefab, Vector3.zero, Quaternion.identity, transform).GetComponent<Cable>();
-                        newCable.GetComponent<LineRenderer>().enabled = true;
-                        newCable.start = datalinkSelected.gameObject.transform;
-                        newCable.end = newLink.transform;
-                        newCable.b1 = false;
-
-                        EthernetDataLinkPort dt1 = newLink.GetComponent<EthernetDataLinkPort>();
-                        EthernetDataLinkPort dt2 = datalinkSelected.GetComponent<EthernetDataLinkPort>();
-
-                        dt1.PluggedDevice = dt2;
-                        dt2.PluggedDevice = dt1;
-
-                        isClickedOver = false;
-                        datalinkSelected = null;
-
-                        break;
-                    }
-                }
-
-            }
-
-            if (currentTrackedCable != null)
-            {
-                Destroy(currentTrackedCable.gameObject);
-            }
-                datalinkSelected = null;
-        }
+    private void CheckIsDragging()
+    {
+        IsDragging = IsClicked && Input.GetMouseButton(0);
     }
 }

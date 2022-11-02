@@ -1,16 +1,23 @@
 using UnityEngine;
 
-public abstract class BaseDevice : MonoBehaviour, Hardware
+/* todo dispositivo no sistema */
+public abstract class AbstractHardware : MonoBehaviour
 {
-
-    public static readonly long INVALID_ID = -100;
+    public static readonly long INVALID_ID = -1024;
 
     private string m_Name;
 
     public string Name 
     { 
         get => m_Name; 
-        set => m_Name = value; 
+        set
+        {
+            if (!m_Name.Equals(value))
+            {
+                m_Name = value;
+                gameObject.name = Name + "  [GameDevice]";
+            }
+        } 
     }
 
     private long id = INVALID_ID;
@@ -26,19 +33,5 @@ public abstract class BaseDevice : MonoBehaviour, Hardware
             id = value;
         }
     }
-
-    public virtual void Awake()
-    {
-        Debug.Log("Awake:BaseDevice");
-    }
-
-    public virtual void Start()
-    {
-        Debug.Log("Start:BaseDevice");
-    }
-
-    public virtual void Update() {}
-
     public abstract void Initialize();
-
 }

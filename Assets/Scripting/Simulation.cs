@@ -17,7 +17,7 @@ public class Simulation : MonoBehaviour
     public void initState()
     {
         /* iniciando todos os dispositivos */
-        foreach (ComputerDevice device in FindObjectsOfType<ComputerDevice>())
+        foreach (DefaultComputer device in FindObjectsOfType<DefaultComputer>())
         {
             device.Initialize();
         }

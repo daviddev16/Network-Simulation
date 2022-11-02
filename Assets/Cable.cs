@@ -1,61 +1,43 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
-
-[ExecuteInEditMode]
 [RequireComponent(typeof(LineRenderer))]
 public class Cable : MonoBehaviour
 {
 
-    public Transform start;
-    public Transform end;
+    [SerializeField] public Transform start;
+    [SerializeField] public Transform end;
+    [SerializeField] private LineRenderer lineRenderer;
 
-    private Vector3[] positions = new Vector3[4];
-
-    private LineRenderer lineRenderer;
-
-    [SerializeField] public bool b0;
-    [SerializeField] public bool b1;
-
-    private Vector3 endDiff;
-    private Vector3 diff;
-
-    void Start() 
+    public Transform StartLocation
     {
-        endDiff = new Vector3(end.position.x, end.position.y, 0);
+        get => start;
+        set => start = value;
+    }
+    public Transform EndLocation
+    {
+        get => end;
+        set => end = value;
     }
 
+    private Vector3[] positions = new Vector3[2];
+    void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = 2;
+    }
     void Update()
     {
-        if (lineRenderer == null)
-            lineRenderer = GetComponent<LineRenderer>();
-
         positions[0] = start.position;
-        positions[1] = start.position + (b0 ? Vector3.right :  Vector3.left) * 0.1f;
-
-        positions[2] = end.position - (b1 ? Vector3.right : Vector3.left) * 0.1f;
-        positions[3] = end.position;
-
-        lineRenderer.positionCount = 4;
+        positions[1] = end.position;
         lineRenderer.SetPositions(positions);
-
-        if (diff.x < 0.01)
-        {
-            b1 = false;
-        }
-        else
-        {
-            b1 = true;
-        }
-
     }
 
-    private void FixedUpdate()
-    {
-        diff = end.position - endDiff;
-        //Debug.Log(diff.x);
-    }
+    public void Show() 
+        => lineRenderer.enabled = true;
+
+    public void Hide() 
+        => lineRenderer.enabled = false;
+
+    public void Disconnect() => Destroy(gameObject);
 
 }
