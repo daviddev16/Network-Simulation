@@ -1,42 +1,44 @@
 
-using System;
 using UnityEngine;
 
 public class CableManager : MonoBehaviour
 {
-    private Edit2Controller controller;
+
+    public static CableManager Instance { get; private set; }
+
+    [SerializeField] private bool isClicked = false;
+    [SerializeField] public bool isDragging = false;
 
     [SerializeField] private AbstractPhysicalLink selectedPhysicalLink;
     [SerializeField] private Cable ghostCable;
-    
-    [SerializeField] private bool IsClicked;
-    [SerializeField] public bool IsDragging = false;
 
-    void Start()
+    void Awake()
     {
-        controller = FindObjectOfType<Edit2Controller>();
+        if (Instance != null)
+            Destroy(gameObject);
+        
+        Instance = this;
     }
 
     void Update()
     {
-        /*if (controller.IsDragging)
-        {
+        if (LinkMoveController.Instance.IsDragging)
             return;
-        }*/
+
         DetectClickInPhysicalLinkOnScreen();
         CheckIsCastingOtherLink();
         ManageGhostCable();
-        CheckIsDragging();
+        CheckisDragging();
     }
-
+        
     private void CheckIsCastingOtherLink()
     {
         if (Input.GetMouseButtonUp(0))
         {
-            IsClicked = false;
+            isClicked = false;
             if (selectedPhysicalLink != null)
             {
-                AbstractPhysicalLink otherPhysicalLink = FindPhysicalLinkOnScreen();
+                AbstractPhysicalLink otherPhysicalLink = Utility.FindPhysicalLinkOnScreen();
 
                 /* verificar se não é o mesmo gameobject ou se o outro link já não está conectado */
                 if (otherPhysicalLink == null || 
@@ -62,7 +64,7 @@ public class CableManager : MonoBehaviour
     /* gerenciar cabo temporario */
     private void ManageGhostCable()
     {
-        if (IsDragging)
+        if (isDragging)
         {
             if (selectedPhysicalLink != null)
             {
@@ -73,9 +75,8 @@ public class CableManager : MonoBehaviour
                 }
                 else if (ghostCable != null)
                 {
-                    Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    pos.z = 0;
-                    ghostCable.EndLocation.position = pos;
+                    Vector3 worldPosition = Utility.GetMouseWorldPosition();
+                    ghostCable.EndLocation.position = worldPosition;
                     ghostCable.Show();
                 }
             }
@@ -93,20 +94,20 @@ public class CableManager : MonoBehaviour
     /* detectar se o usuário está tentando criar uma conexão em um PhysicalLink */
     private void DetectClickInPhysicalLinkOnScreen()
     {
-        if (!IsDragging)
+        if (!isDragging)
         {
             selectedPhysicalLink = null;
         }
         if (Input.GetMouseButtonDown(0))
         {
             /* achou um link na tela */
-            AbstractPhysicalLink detectedPhysicalLink = FindPhysicalLinkOnScreen();
+            AbstractPhysicalLink detectedPhysicalLink = Utility.FindPhysicalLinkOnScreen();
 
             if (detectedPhysicalLink == null)
                 return;
 
             selectedPhysicalLink = detectedPhysicalLink;
-            IsClicked = true;
+            isClicked = true;
             
             /* remover link */
             if (Input.GetKey(KeyCode.LeftAlt) && selectedPhysicalLink.Other != null)
@@ -114,19 +115,6 @@ public class CableManager : MonoBehaviour
         }
     }
 
-    private AbstractPhysicalLink FindPhysicalLinkOnScreen()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit2D[] hits = Physics2D.GetRayIntersectionAll(ray, 10f);
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider.TryGetComponent<AbstractPhysicalLink>(out var physicalLink))
-            {
-                return physicalLink;
-            }
-        }
-        return null;
-    }
     private void ClearLinkConnection(ref AbstractPhysicalLink physicalLink)
     {
         physicalLink.ConnectedCable.Disconnect();
@@ -141,8 +129,8 @@ public class CableManager : MonoBehaviour
         return Instantiate(cablePrefab, Vector3.zero, Quaternion.identity, transform).GetComponent<Cable>();
     }
 
-    private void CheckIsDragging()
+    private void CheckisDragging()
     {
-        IsDragging = IsClicked && Input.GetMouseButton(0);
+        isDragging = isClicked && Input.GetMouseButton(0);
     }
 }
