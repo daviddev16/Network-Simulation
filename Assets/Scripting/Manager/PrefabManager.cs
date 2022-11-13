@@ -1,6 +1,4 @@
 
-
-
 using UnityEngine;
 
 public class PrefabManager : MonoBehaviour
@@ -17,10 +15,8 @@ public class PrefabManager : MonoBehaviour
     private void Awake()
     {
         if (Instance != null)
-        {
-            Debug.LogWarning("Já existe uma instancia desse object.");
             Destroy(gameObject);
-        }
+        
         Instance = this;
         DontDestroyOnLoad(Instance);
     }

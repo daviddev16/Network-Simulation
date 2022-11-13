@@ -12,10 +12,10 @@ public abstract class AbstractHardware : MonoBehaviour
         get => m_Name; 
         set
         {
-            if (!m_Name.Equals(value))
+            if (m_Name != value)
             {
                 m_Name = value;
-                gameObject.name = Name + "  [GameDevice]";
+                gameObject.name = Name;
             }
         } 
     }

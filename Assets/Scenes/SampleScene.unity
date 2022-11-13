@@ -512,6 +512,13 @@ MonoBehaviour:
   macAddress: a0x0a0x0s0a
   physicalLink: {fileID: 1945857416}
   networkDevice: {fileID: 0}
+  configuration:
+    address:
+      address: 
+    subnetMask:
+      address: 
+    defaultGateway:
+      address: 
 --- !u!114 &126958063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1182,7 +1189,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae0957e3c65feb84185b61e4b414effc, type: 3}
   m_Name: 
@@ -1466,7 +1473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a992b0da62a43d843a077ad515388227, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataBitPrefab: {fileID: 2401317546530073418, guid: 72c045320b8a53944b6a2c8dcc6ac5f7, type: 3}
 --- !u!4 &724322969
 Transform:
   m_ObjectHideFlags: 0
@@ -1682,6 +1688,13 @@ MonoBehaviour:
   macAddress: a0x0a0x0s0a
   physicalLink: {fileID: 1989690377}
   networkDevice: {fileID: 0}
+  configuration:
+    address:
+      address: 
+    subnetMask:
+      address: 
+    defaultGateway:
+      address: 
 --- !u!114 &829935561
 MonoBehaviour:
   m_ObjectHideFlags: 0

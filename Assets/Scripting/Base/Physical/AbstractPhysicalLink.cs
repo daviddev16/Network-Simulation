@@ -59,35 +59,12 @@ public abstract class AbstractPhysicalLink : MonoBehaviour
         Other = null;
     }
 
-    /*
-     * send, receive signals
-     */
-
-    /*
-    public void SendSignal()
+    public void Send(DatagramPacket packet)
     {
-        if (PluggedDevice != null)
-        {
-            if (PluggedDevice is EthernetDataLinkPort)
-            {
-                DataLake.SpawnBit(this, PluggedDevice); 
-                ((EthernetDataLinkPort)PluggedDevice).ReceiveSignal();
-            }
-        }
+        if (Other != null)
+            Other.Receive(packet);
     }
-    
-    public void ReceiveSignal() 
-    {
-        Debug.Log("[" + Parent.MacAddress + "] Received something from [" + PluggedDevice.Parent.MacAddress + "].");
 
-        if (PluggedDevice != null)
-        {
-            if (PluggedDevice is EthernetDataLinkPort)
-            {
-                ((EthernetDataLinkPort)PluggedDevice).SendSignal();
-            }
-        }
-    }*/
-
+    public abstract void Receive(DatagramPacket packet);
 
 }

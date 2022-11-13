@@ -6,7 +6,12 @@ public class Simulation : MonoBehaviour
 {
     void Start()
     {
-        initState();
+
+        string ip = "192.168.1.56";
+        string subnetMask = "255.255.255.224";
+        Debug.Log("NetworkID: " + Utility.GetNetworkID(ip, subnetMask));
+
+        //initState();
     }
 
     void Update()
